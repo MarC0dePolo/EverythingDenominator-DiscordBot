@@ -20,25 +20,22 @@ class Chart:
         self.interval = interval
         
         # Download data from yf api and configure for chart plotting        
+    def getDataFrame(self):
         self.data = yf.download(tickers=self.tickers, period=self.period, interval=self.interval)
         self.data = pd.DataFrame(self.data)
         self.data.reset_index(inplace=True)
-        global ohlc
-        ohlc = self.data.loc[:, ['Date', 'Open', 'High', 'Low', 'Close']]
-        ohlc['Date'] = pd.to_datetime(ohlc['Date'])
-        ohlc['Date'] = ohlc['Date'].apply(mpl_dates.date2num)
-        ohlc = ohlc.astype(float)
-
-    def __str__(self) -> str:
-        return f"{self.tickers} chart {self.period}-timeframe {self.interval}-candles"
-    
-    def getDataFrame(self):
-        return self.data
+        data = self.data
+        return data
     
     def getValueSetup(self):
         return self.tickers, self.period, self.interval
 
-    def plotChart(self):
+    def plotChart(self, dataFrame):
+        ohlc = dataFrame.loc[:, ['Date', 'Open', 'High', 'Low', 'Close']]
+        ohlc['Date'] = pd.to_datetime(ohlc['Date'])
+        ohlc['Date'] = ohlc['Date'].apply(mpl_dates.date2num)
+        ohlc = ohlc.astype(float)
+
         fig, ax = plt.subplots()
         # plot width with a dict depending on interval scale
         candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
@@ -54,47 +51,32 @@ class Chart:
         fig.autofmt_xdate()
         fig.tight_layout()
         plt.show()
+
+    #def __str__(self) -> str:
+     #   return f"{self.tickers} chart {self.period}-timeframe {self.interval}-candles"
     
 
-class MyCounterValueChart:
+    
+
+class MyCounterValueChart(Chart):
     def __init__(self, valueSetup, valueDataFrame, CvalueDataFrame):
         self.tickerValue, self.periodValue, self.intervalValue = valueSetup
         self.valueDataFrame = valueDataFrame
         self.CvalueDataFrame = CvalueDataFrame
 
-    def calculate(self):
+    def calculateDataFrame(self):
         myChart = pd.DataFrame(self.valueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']]/self.CvalueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']])
         dates = self.CvalueDataFrame.loc[:, ['Date']]
         myChart = pd.concat([dates, myChart], axis=1)
-        print(myChart)
-        ohlc = self.data.loc[:, ['Date', 'Open', 'High', 'Low', 'Close']]
-        ohlc['Date'] = pd.to_datetime(ohlc['Date'])
-        ohlc['Date'] = ohlc['Date'].apply(mpl_dates.date2num)
-        ohlc = ohlc.astype(float)
-
-    def plotChart(self):
-        fig, ax = plt.subplots()
-        # plot width with a dict depending on interval scale
-        candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
-
-        # Setting labels & titles
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Price')
-        fig.suptitle(f'{self.__str__()}')
-
-        # Formatting Date
-        date_format = mpl_dates.DateFormatter('%d-%m-%Y')
-        ax.xaxis.set_major_formatter(date_format)
-        fig.autofmt_xdate()
-        fig.tight_layout()
-        plt.show()
-    
+        return myChart
 
 btcusd = Chart('BTC-USD', '1mo', '1d')
 ethusd = Chart("ETH-USD", "1mo", "1d")
+#btcusd.plotChart(btcusd.getDataFrame())
 print(btcusd)
 print(ethusd)
 
-btc_eth = MyCounterValueChart(btcusd.getValueSetup(), ethusd.getDataFrame(), btcusd.getDataFrame())
+eth_btc = MyCounterValueChart(btcusd.getValueSetup(), ethusd.getDataFrame(), btcusd.getDataFrame())
+eth_btc.plotChart(eth_btc.calculateDataFrame())
 #btcusd.plotChart()
-btc_eth.plotChart()
+#eth_btc.plotChart(eth_btc.calculate())
