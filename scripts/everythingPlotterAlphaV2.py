@@ -8,7 +8,6 @@ import yfinance as yf
 
 # Define a Chart class for plotting candlestick charts
 class Chart:
-    
     plt.style.use('ggplot')
     
     # Initialize the Chart object with tickers, period, and interval parameters
@@ -29,7 +28,7 @@ class Chart:
     def getValueSetup(self):
         return self.tickers, self.period, self.interval
     
-    # Plot a candlestick chart using mpl_finance package and a DataFrame object containing OHLC data
+    # Plot a candlestick chart using a DataFrame object containing OHLC data
     def plotChart(self, dataFrame):
         ohlc = dataFrame.loc[:, ['Date', 'Open', 'High', 'Low', 'Close']]
         ohlc['Date'] = pd.to_datetime(ohlc['Date'])
@@ -50,7 +49,7 @@ class Chart:
         fig.tight_layout()
         plt.show()
 
-# Define a subclass of the Chart class for plotting the value of Ethereum in Bitcoin terms
+# Define a subclass of the Chart class for plotting the value of two Charts
 class MyCounterValueChart(Chart):
     # Initialize the MyCounterValueChart object with the value setup and DataFrame objects for Ethereum and Bitcoin
     def __init__(self, valueSetup, valueDataFrame, CvalueDataFrame):
@@ -58,18 +57,12 @@ class MyCounterValueChart(Chart):
         self.valueDataFrame = valueDataFrame
         self.CvalueDataFrame = CvalueDataFrame
     
-    # Calculate the value of Ethereum in Bitcoin terms and return a DataFrame object
+    # Calculate the value of two assets divide it by the 
+    # counter value and return a DataFrame object for plotting
     def calculateDataFrame(self):
-        # Divide Ethereum OHLC data by corresponding Bitcoin OHLC data for each date
+        # Divide asset by the counter asset 
+        # and return OHLC data for each column beeing ['Open', 'High', 'Low', 'Close']
         myChart = pd.DataFrame(self.valueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']]/self.CvalueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']])
         dates = self.CvalueDataFrame.loc[:, ['Date']]
         myChart = pd.concat([dates, myChart], axis=1)
         return myChart
-
-# Instantiate Chart objects for Bitcoin and Ethereum
-btcusd = Chart('BTC-USD', '1mo', '1d')
-ethusd = Chart("ETH-USD", "1mo", "1d")
-
-# Instantiate a MyCounterValueChart object for Ethereum priced in Bitcoin terms using the value setup and DataFrame objects for Bitcoin and Ethereum
-eth_btc = MyCounterValueChart(btcusd.getValueSetup(), ethusd.getDataFrame(), btcusd.getDataFrame())
-eth_btc.plotChart(eth_btc.calculateDataFrame())
