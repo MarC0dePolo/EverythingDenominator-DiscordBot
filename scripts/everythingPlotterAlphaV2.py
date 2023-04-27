@@ -1,5 +1,3 @@
-import pandas as pd
-import yfinance as yf
 import matplotlib.pyplot as plt
 from mpl_finance import candlestick_ohlc
 import pandas as pd
