@@ -9,7 +9,7 @@ import yfinance as yf
 # Define a Chart class for plotting candlestick charts
 class Chart:
     
-    plt.style.use('ggplot')
+    plt.style.use("dark_background")
     
     # Initialize the Chart object with tickers, period, and interval parameters
     def __init__(self, tickers, period, interval) -> None:
@@ -35,10 +35,13 @@ class Chart:
         ohlc['Date'] = pd.to_datetime(ohlc['Date'])
         ohlc['Date'] = ohlc['Date'].apply(mpl_dates.date2num)
         ohlc = ohlc.astype(float)
-        
+        # Creating Subplots
         fig, ax = plt.subplots()
+        
+        # Plotting Candlestick
         candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
-
+        
+        # Setting labels & titles
         ax.set_xlabel('Date')
         ax.set_ylabel('Price')
         fig.suptitle(None)
@@ -48,8 +51,13 @@ class Chart:
         ax.xaxis.set_major_formatter(date_format)
         fig.autofmt_xdate()
         fig.tight_layout()
+        
+    def showChart(self):
         plt.show()
-
+        
+    def saveChart(self):
+        plt.savefig('chart.png')
+        
 # Define a subclass of the Chart class for plotting the value of Ethereum in Bitcoin terms
 class MyCounterValueChart(Chart):
     # Initialize the MyCounterValueChart object with the value setup and DataFrame objects for Ethereum and Bitcoin
@@ -61,15 +69,11 @@ class MyCounterValueChart(Chart):
     # Calculate the value of Ethereum in Bitcoin terms and return a DataFrame object
     def calculateDataFrame(self):
         # Divide Ethereum OHLC data by corresponding Bitcoin OHLC data for each date
-        myChart = pd.DataFrame(self.valueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']]/self.CvalueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']])
+        myChart = pd.DataFrame(self.valueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']]\
+                                /self.CvalueDataFrame.loc[:, ['Open', 'High', 'Low', 'Close']])
+        
+        # Insert the Date column from DataFrame object
         dates = self.CvalueDataFrame.loc[:, ['Date']]
         myChart = pd.concat([dates, myChart], axis=1)
         return myChart
 
-# Instantiate Chart objects for Bitcoin and Ethereum
-btcusd = Chart('BTC-USD', '1mo', '1d')
-ethusd = Chart("ETH-USD", "1mo", "1d")
-
-# Instantiate a MyCounterValueChart object for Ethereum priced in Bitcoin terms using the value setup and DataFrame objects for Bitcoin and Ethereum
-eth_btc = MyCounterValueChart(btcusd.getValueSetup(), ethusd.getDataFrame(), btcusd.getDataFrame())
-eth_btc.plotChart(eth_btc.calculateDataFrame())
