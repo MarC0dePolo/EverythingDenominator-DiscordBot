@@ -1,1 +1,0 @@
-# EverythingDenominator-DiscordBot
