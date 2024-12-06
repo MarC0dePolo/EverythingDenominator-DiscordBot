@@ -2,6 +2,7 @@ import discord
 import responses
 import backend
 import mytoken
+import traceback
 
 # Asynchronous function to send messages based on user input
 async def send_message(message, user_message):
@@ -24,6 +25,7 @@ async def send_message(message, user_message):
 
     except Exception as e:
         print(e)
+        traceback.print_exc()
 
 # Function to run the Discord bot
 def run_discord_bot():
