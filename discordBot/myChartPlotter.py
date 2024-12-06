@@ -11,7 +11,8 @@ class Chart:
 
     # Download historical OHLC data using yfinance package and return a DataFrame object
     def getDataFrame(self):
-        self.data = yf.download(tickers=self.tickers, period=self.period, interval=self.interval)
+        asset = yf.Ticker(self.tickers)
+        stock_data = asset.history(period=self.period, interval=self.interval)
         self.data = pd.DataFrame(self.data)
         data = self.data
         return data
