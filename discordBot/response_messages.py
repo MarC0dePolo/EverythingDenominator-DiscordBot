@@ -6,8 +6,11 @@ $plot [-n] [ticker] [/] [period] [interval]
 i.e:  $plot -n BTC-USD / 1y 1wk
 
 Chart with choosen counter value:
-plot [-c] [ticker1] [ticker2] [period] [interval]
-i.e:  $plot -c BTC-USD ETH-USD 1y 1wk
+plot [-c] [ticker1/[type]] [ticker2/[type]] [period] [interval]
+i.e:  $plot -c MSTR/s BTC-USD/c 1y 1wk
+
+/s stands for stock or weekend closing asset
+/c stands for crypto asset
 
 spaces are the seperator
     
