@@ -11,22 +11,22 @@ def checkInput(user_message) -> bool:
         return False
 
 # Function to create a C-Value plot
-def getCValPlot(commands: tuple):
+def getCValPlot(ticker1, type1, ticker2, type2, period, interval):
     # Unpack the tuple of commands
-    ticker1, ticker2, period, interval = commands
+    #ticker1, ticker2, period, interval = commands
     
     # Create two individual charts for each ticker
     chart1 = myChartPlotter.Chart(tickers=ticker1, period=period, interval=interval)
     chart2 = myChartPlotter.Chart(tickers=ticker2, period=period, interval=interval)
     
     # Create a C-Value chart using the two individual charts
-    mainChart = myChartPlotter.CValueChart(chart1.getValueSetup(), chart1.getDataFrame(), chart2.getDataFrame())
+    mainChart = myChartPlotter.CValueChart(chart1.getValueSetup(), chart1.getDataFrame(), type1, chart2.getDataFrame(), type2)
     mainChart.plotChart(mainChart.calculateDataFrame(), f'{chart1.getName()}/{chart2.getName()}')
 
 # Function to create a normal plot
-def getNormalPlot(commands: tuple):
+def getNormalPlot(ticker, period, interval):
     # Unpack the tuple of commands
-    ticker, period, interval = commands
+    #ticker, period, interval = commands
     
     # Create a chart for the specified ticker
     mainChart = myChartPlotter.Chart(ticker, period, interval)
@@ -46,8 +46,16 @@ def getPlot(user_message):
 
     # If the plot should be a normal chart
     if flag == '-n' and ticker2 == '/':
-        getNormalPlot((ticker1, period, interval))
+        getNormalPlot(ticker1, period, interval)
     
     # If the plot should be a C-Value chart
     elif flag == '-c':
-        getCValPlot((ticker1, ticker2, period, interval))
+        asset1 = ticker1.split("/")
+        ticker1 = asset1[0]
+        type1 = asset1[1]
+
+        asset2 = ticker2.split("/")
+        ticker2 = asset2[0]
+        type2 = asset2[1]
+
+        getCValPlot(ticker1, type1, ticker2, type2, period, interval)
