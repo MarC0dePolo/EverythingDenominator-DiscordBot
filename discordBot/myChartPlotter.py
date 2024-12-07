@@ -13,7 +13,7 @@ class Chart:
     def getDataFrame(self):
         asset = yf.Ticker(self.tickers)
         stock_data = asset.history(period=self.period, interval=self.interval)
-        self.data = pd.DataFrame(self.data)
+        self.data = pd.DataFrame(stock_data)
         data = self.data
         return data
 
@@ -31,12 +31,21 @@ class Chart:
                             title=name)
                             
 class CValueChart(Chart):
-    # Initialize the CValueChart object with the value setup and DataFrame objects for Ethereum and Bitcoin
-    def __init__(self, valueSetup, valueDataFrame, CvalueDataFrame):
+    def __init__(self, valueSetup, valueDataFrame : pd.DataFrame, type1, CvalueDataFrame : pd.DataFrame, type2):
         self.tickerValue, self.periodValue, self.intervalValue = valueSetup
+        
+        # i.e if BTC-USD / MSCI-World resize BTC-USD to MSCI-World time-index
+        if type1 == 'c' and type2 == 's':
+            valueDataFrame = valueDataFrame.reindex(CvalueDataFrame.index, method="ffill")
+        
+        elif type1 == 's' and type2 == 'c':
+            CvalueDataFrame = CvalueDataFrame.reindex(valueDataFrame.index, method="ffill")
+
+        else:
+            valueDataFrame = valueDataFrame.reindex(CvalueDataFrame.index, method="ffill")
+
         self.valueDataFrame = valueDataFrame
         self.CvalueDataFrame = CvalueDataFrame
-
     
     def calculateDataFrame(self):
         return self.valueDataFrame.div(self.CvalueDataFrame)
